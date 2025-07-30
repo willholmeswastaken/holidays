@@ -8,11 +8,14 @@ import {
   TabsContent,
 } from "../../../components/ui/tabs";
 import { useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 type ToggleView = "list" | "map";
 
 export default function AppHome() {
   const [scrapbookView, setScrapbookView] = useState<ToggleView>("list");
+  const tasks = useQuery(api.tasks.get);
 
   return (
     <div className="flex-1">
@@ -38,7 +41,9 @@ export default function AppHome() {
           </TabsList>
 
           <TabsContent value="list" className="space-y-4">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {tasks?.map((task) => <div key={task._id}>{task.text}</div>)}
+            </div>
           </TabsContent>
 
           <TabsContent value="map">
