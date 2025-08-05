@@ -16,8 +16,10 @@ import {
 } from "@/components/ui/select";
 import { DatePicker } from "./date-picker";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 
 export function AddHolidayForm() {
+  const { getToken } = useAuth();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -45,9 +47,27 @@ export function AddHolidayForm() {
     }
   };
 
-  const handleCoverUpload = (files: FileList | null) => {
+  const handleCoverUpload = async (files: FileList | null) => {
     if (files && files[0]) {
       setCoverImage(files[0]);
+    }
+
+    try {
+      const token = await getToken({ template: "convex" });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_CONVEX_PUBLIC_URL}/holidays/image`,
+        {
+          method: "POST",
+          headers: {
+            "x-holiday-id": "j9752ft5s0q8z05h5grdv1c6wh7mwc6e",
+            "Content-Type": "image/png",
+            Authorization: `Bearer ${token}`,
+          },
+          body: files![0],
+        }
+      );
+    } catch (error) {
+      console.error("Error uploading image:", error);
     }
   };
 
