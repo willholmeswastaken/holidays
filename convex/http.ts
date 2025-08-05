@@ -23,10 +23,18 @@ http.route({
       holidayId: holidayId as Id<"holidays">,
     });
     console.log("Added image");
+    const origin = request.headers.get("Origin");
+    const allowedOrigins = [
+      "http://localhost:3000",
+      process.env.CLIENT_ORIGIN!,
+    ];
+    const corsOrigin =
+      origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+
     return new Response(null, {
       status: 200,
       headers: new Headers({
-        "Access-Control-Allow-Origin": "http://localhost:3000",
+        "Access-Control-Allow-Origin": corsOrigin,
         Vary: "origin",
       }),
     });
@@ -45,10 +53,17 @@ http.route({
       headers.get("Access-Control-Request-Method") !== null &&
       headers.get("Access-Control-Request-Headers") !== null
     ) {
+      const origin = request.headers.get("Origin");
+      const allowedOrigins = [
+        "http://localhost:3000",
+        process.env.CLIENT_ORIGIN!,
+      ];
+      const corsOrigin =
+        origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+
       return new Response(null, {
         headers: new Headers({
-          // e.g. https://mywebsite.com, configured on your Convex dashboard
-          "Access-Control-Allow-Origin": "http://localhost:3000",
+          "Access-Control-Allow-Origin": corsOrigin,
           "Access-Control-Allow-Methods": "POST",
           "Access-Control-Allow-Headers":
             "Content-Type, x-holiday-id, Authorization",

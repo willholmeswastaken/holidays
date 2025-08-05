@@ -10,6 +10,7 @@ interface ProtectedMutationCtx extends MutationCtx {
   identity: UserIdentity;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function protectedQuery<Output, TArgs extends { [x: string]: any }>({
   handler,
   args,
@@ -48,6 +49,7 @@ export function protectedQuery<Output, TArgs extends { [x: string]: any }>({
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function protectedMutation<TArgs extends { [x: string]: any }>({
   handler,
   args,

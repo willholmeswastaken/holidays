@@ -34,7 +34,13 @@ export const getById = protectedQuery({
 });
 
 export const addImage = internalMutation({
-  handler: (ctx, { storageId, holidayId }) => {
+  handler: async (ctx, { storageId, holidayId }) => {
+    const holiday = await ctx.db.get(holidayId);
+
+    if (holiday?.coverPhotoId) {
+      await ctx.storage.delete(holiday.coverPhotoId);
+    }
+
     return ctx.db.patch(holidayId, {
       coverPhotoId: storageId,
     });
