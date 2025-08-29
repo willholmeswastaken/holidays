@@ -1,6 +1,6 @@
 import { protectedQuery } from "@/convex/util";
 import { ConvexError, v } from "convex/values";
-import { internalMutation } from "./_generated/server";
+import { internalMutation, mutation } from "./_generated/server";
 
 export const get = protectedQuery({
   handler: async (ctx) => {
@@ -48,5 +48,37 @@ export const addImage = internalMutation({
   args: {
     storageId: v.string(),
     holidayId: v.id("holidays"),
+  },
+});
+
+export const create = mutation({
+  args: {
+    title: v.string(),
+    description: v.optional(v.string()),
+    // Use one date for both start and end for now
+    date: v.string(),
+    location: v.string(),
+    // Optional lat/lng from client; default to 0 if not provided
+    locationLat: v.optional(v.number()),
+    locationLng: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new ConvexError("Not authenticated");
+    }
+
+    const insertedId = await ctx.db.insert("holidays", {
+      userId: identity.subject,
+      title: args.title,
+      description: args.description,
+      startDate: args.date,
+      endDate: args.date,
+      location: args.location,
+      locationLat: args.locationLat ?? 0,
+      locationLng: args.locationLng ?? 0,
+    });
+
+    return insertedId;
   },
 });

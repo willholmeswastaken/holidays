@@ -2,30 +2,46 @@
 
 import type React from "react";
 import { useState, useRef } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { Calendar, MapPin, Upload, X, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { DatePicker } from "./date-picker";
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
+
+type AddHolidayFormValues = {
+  title: string;
+  description?: string;
+  location: string;
+  date: string;
+  privacy: string;
+};
 
 export function AddHolidayForm() {
   const { getToken } = useAuth();
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    location: "",
-    date: "",
-    privacy: "everyone",
+  const router = useRouter();
+  const createHoliday = useMutation(api.holidays.create);
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    watch,
+  } = useForm<AddHolidayFormValues>({
+    defaultValues: {
+      title: "",
+      description: "",
+      location: "",
+      date: "",
+      privacy: "everyone",
+    },
+    mode: "onChange",
   });
 
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -33,9 +49,33 @@ export function AddHolidayForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData, uploadedFiles, coverImage);
+  const onSubmit = async (data: AddHolidayFormValues) => {
+    const holidayId = await createHoliday({
+      title: data.title,
+      description: data.description || undefined,
+      date: data.date,
+      location: data.location,
+      locationLat: 0,
+      locationLng: 0,
+    });
+
+    if (coverImage) {
+      const token = await getToken({ template: "convex" });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_CONVEX_PUBLIC_URL}/holidays/image`,
+        {
+          method: "POST",
+          headers: {
+            "x-holiday-id": holidayId,
+            "Content-Type": coverImage.type || "application/octet-stream",
+            Authorization: `Bearer ${token}`,
+          },
+          body: coverImage,
+        }
+      );
+    }
+
+    void router.push("/app");
   };
 
   const handleFileUpload = (files: FileList | null) => {
@@ -47,27 +87,9 @@ export function AddHolidayForm() {
     }
   };
 
-  const handleCoverUpload = async (files: FileList | null) => {
+  const handleCoverUpload = (files: FileList | null) => {
     if (files && files[0]) {
       setCoverImage(files[0]);
-    }
-
-    try {
-      const token = await getToken({ template: "convex" });
-      await fetch(
-        `${process.env.NEXT_PUBLIC_CONVEX_PUBLIC_URL}/holidays/image`,
-        {
-          method: "POST",
-          headers: {
-            "x-holiday-id": "j9752ft5s0q8z05h5grdv1c6wh7mwc6e",
-            "Content-Type": "image/png",
-            Authorization: `Bearer ${token}`,
-          },
-          body: files![0],
-        }
-      );
-    } catch (error) {
-      console.error("Error uploading image:", error);
     }
   };
 
@@ -77,7 +99,7 @@ export function AddHolidayForm() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {/* Details Section */}
         <div className="bg-white border border-gray-200 rounded-lg">
           <div className="border-b border-gray-200 px-6 py-4">
@@ -96,12 +118,12 @@ export function AddHolidayForm() {
               <Input
                 id="title"
                 placeholder="Give your holiday a memorable title"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
                 className="w-full"
+                {...register("title", { required: "Title is required" })}
               />
+              {errors.title && (
+                <p className="text-xs text-red-600">{errors.title.message}</p>
+              )}
             </div>
 
             {/* Description */}
@@ -116,13 +138,20 @@ export function AddHolidayForm() {
                 id="description"
                 placeholder="Share your holiday story and memorable moments..."
                 className="min-h-[100px] resize-none"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
+                {...register("description", {
+                  maxLength: {
+                    value: 2000,
+                    message: "Description must be 2000 characters or less",
+                  },
+                })}
               />
+              {errors.description && (
+                <p className="text-xs text-red-600">
+                  {errors.description.message}
+                </p>
+              )}
               <div className="text-xs text-gray-500 text-right">
-                {formData.description.length}/2000
+                {(watch("description") || "").length}/2000
               </div>
             </div>
 
@@ -179,17 +208,21 @@ export function AddHolidayForm() {
               <div className="relative">
                 <Input
                   placeholder="Search locations"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
                   className="w-full"
+                  {...register("location", {
+                    required: "Location is required",
+                  })}
                 />
               </div>
-              {formData.location && (
+              {errors.location && (
+                <p className="text-xs text-red-600">
+                  {errors.location.message}
+                </p>
+              )}
+              {watch("location") && (
                 <div className="flex flex-wrap gap-2 mt-2">
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
-                    {formData.location}
+                    {watch("location")}
                   </span>
                 </div>
               )}
@@ -201,11 +234,21 @@ export function AddHolidayForm() {
                 <Calendar className="h-4 w-4" />
                 Date Visited
               </Label>
-              <DatePicker
-                value={formData.date}
-                onChange={(date) => setFormData({ ...formData, date })}
-                placeholder="Select date"
+              <Controller
+                name="date"
+                control={control}
+                rules={{ required: "Date is required" }}
+                render={({ field }) => (
+                  <DatePicker
+                    value={field.value}
+                    onChange={(val) => field.onChange(val)}
+                    placeholder="Select date"
+                  />
+                )}
               />
+              {errors.date && (
+                <p className="text-xs text-red-600">{errors.date.message}</p>
+              )}
             </div>
 
             {/* Photo Gallery */}
@@ -262,36 +305,6 @@ export function AddHolidayForm() {
           </div>
         </div>
 
-        {/* Settings Section */}
-        <div className="bg-white border border-gray-200 rounded-lg">
-          <div className="border-b border-gray-200 px-6 py-4">
-            <h3 className="text-base font-medium text-gray-900">Settings</h3>
-          </div>
-
-          <div className="p-6 space-y-6">
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-gray-700">
-                Who can view this holiday
-              </Label>
-              <Select
-                value={formData.privacy}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, privacy: value })
-                }
-              >
-                <SelectTrigger className="w-full max-w-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="everyone">Everyone</SelectItem>
-                  <SelectItem value="friends">Friends only</SelectItem>
-                  <SelectItem value="private">Only me</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-
         {/* Action Buttons */}
         <div className="flex gap-3">
           <Button
@@ -299,13 +312,6 @@ export function AddHolidayForm() {
             className="bg-red-500 hover:bg-red-600 text-white px-8"
           >
             Create Holiday
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="px-6 bg-transparent"
-          >
-            Save draft
           </Button>
           <Link href="/app">
             <Button
