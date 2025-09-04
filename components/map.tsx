@@ -7,7 +7,6 @@ import Image from "next/image";
 import { FunctionReturnType } from "convex/server";
 import { api } from "@/convex/_generated/api";
 
-// Type for holiday data with transformed coverPhotoId (URL instead of storage ID)
 type Holiday = FunctionReturnType<typeof api.holidays.get>[0];
 
 type MapboxMapProps = {
