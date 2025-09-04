@@ -3,22 +3,27 @@
 import type React from "react";
 import { useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { Calendar, MapPin, Upload, X, ImageIcon } from "lucide-react";
+import { Calendar, MapPin, ImageIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DatePicker } from "./date-picker";
+import { PlacesAutocomplete } from "./places-input";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
+import { GoogleMapsWrapper } from "./google-maps-wrapper";
 
 type AddHolidayFormValues = {
   title: string;
   description?: string;
   location: string;
+  locationLat: number;
+  locationLng: number;
   date: string;
   privacy: string;
 };
@@ -31,6 +36,7 @@ export function AddHolidayForm() {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
     watch,
   } = useForm<AddHolidayFormValues>({
@@ -38,52 +44,52 @@ export function AddHolidayForm() {
       title: "",
       description: "",
       location: "",
+      locationLat: 0,
+      locationLng: 0,
       date: "",
       privacy: "everyone",
     },
     mode: "onChange",
   });
 
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [coverImage, setCoverImage] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
 
   const onSubmit = async (data: AddHolidayFormValues) => {
-    const holidayId = await createHoliday({
-      title: data.title,
-      description: data.description || undefined,
-      date: data.date,
-      location: data.location,
-      locationLat: 0,
-      locationLng: 0,
-    });
+    setIsLoading(true);
+    try {
+      const holidayId = await createHoliday({
+        title: data.title,
+        description: data.description || undefined,
+        date: data.date,
+        location: data.location,
+        locationLat: data.locationLat,
+        locationLng: data.locationLng,
+      });
 
-    if (coverImage) {
-      const token = await getToken({ template: "convex" });
-      await fetch(
-        `${process.env.NEXT_PUBLIC_CONVEX_PUBLIC_URL}/holidays/image`,
-        {
-          method: "POST",
-          headers: {
-            "x-holiday-id": holidayId,
-            "Content-Type": coverImage.type || "application/octet-stream",
-            Authorization: `Bearer ${token}`,
-          },
-          body: coverImage,
-        }
-      );
-    }
+      if (coverImage) {
+        const token = await getToken({ template: "convex" });
+        await fetch(
+          `${process.env.NEXT_PUBLIC_CONVEX_PUBLIC_URL}/holidays/image`,
+          {
+            method: "POST",
+            headers: {
+              "x-holiday-id": holidayId,
+              "Content-Type": coverImage.type || "application/octet-stream",
+              Authorization: `Bearer ${token}`,
+            },
+            body: coverImage,
+          }
+        );
+      }
 
-    void router.push("/app");
-  };
-
-  const handleFileUpload = (files: FileList | null) => {
-    if (files) {
-      const newFiles = Array.from(files).filter((file) =>
-        file.type.startsWith("image/")
-      );
-      setUploadedFiles((prev) => [...prev, ...newFiles]);
+      void router.push("/app");
+    } catch (error) {
+      console.error("Error creating holiday:", error);
+      // You might want to show an error message to the user here
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -91,10 +97,6 @@ export function AddHolidayForm() {
     if (files && files[0]) {
       setCoverImage(files[0]);
     }
-  };
-
-  const removeFile = (index: number) => {
-    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -163,12 +165,11 @@ export function AddHolidayForm() {
               <div className="flex items-start gap-4">
                 <div className="w-32 h-20 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden">
                   {coverImage ? (
-                    <img
-                      src={
-                        URL.createObjectURL(coverImage) || "/placeholder.svg"
-                      }
+                    <Image
+                      src={URL.createObjectURL(coverImage)}
                       alt="Cover"
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   ) : (
                     <ImageIcon className="h-8 w-8 text-gray-400" />
@@ -189,7 +190,7 @@ export function AddHolidayForm() {
                     onClick={() => coverInputRef.current?.click()}
                     className="mb-2"
                   >
-                    Edit cover
+                    Upload
                   </Button>
                   <p className="text-xs text-gray-500">
                     Select or upload an image that shows your holiday&apos;s
@@ -205,15 +206,27 @@ export function AddHolidayForm() {
                 <MapPin className="h-4 w-4" />
                 Location
               </Label>
-              <div className="relative">
-                <Input
-                  placeholder="Search locations"
-                  className="w-full"
-                  {...register("location", {
-                    required: "Location is required",
-                  })}
-                />
-              </div>
+              <Controller
+                control={control}
+                name="location"
+                rules={{ required: "Location is required" }}
+                render={({ field }) => (
+                  <GoogleMapsWrapper>
+                    <PlacesAutocomplete
+                      address={field.value}
+                      onAddressSelect={(
+                        selectedLocation,
+                        selectedLocationLat,
+                        selectedLocationLng
+                      ) => {
+                        field.onChange(selectedLocation);
+                        setValue("locationLat", selectedLocationLat);
+                        setValue("locationLng", selectedLocationLng);
+                      }}
+                    />
+                  </GoogleMapsWrapper>
+                )}
+              />
               {errors.location && (
                 <p className="text-xs text-red-600">
                   {errors.location.message}
@@ -250,58 +263,6 @@ export function AddHolidayForm() {
                 <p className="text-xs text-red-600">{errors.date.message}</p>
               )}
             </div>
-
-            {/* Photo Gallery */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-gray-700">
-                Photo Gallery
-              </Label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={(e) => handleFileUpload(e.target.files)}
-                  className="hidden"
-                />
-                <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600 mb-2">
-                  Drag and drop your photos here
-                </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  Choose Files
-                </Button>
-              </div>
-
-              {uploadedFiles.length > 0 && (
-                <div className="grid grid-cols-4 gap-3 mt-4">
-                  {uploadedFiles.map((file, index) => (
-                    <div key={index} className="relative group">
-                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                        <img
-                          src={URL.createObjectURL(file) || "/placeholder.svg"}
-                          alt={file.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeFile(index)}
-                        className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
@@ -309,15 +270,24 @@ export function AddHolidayForm() {
         <div className="flex gap-3">
           <Button
             type="submit"
-            className="bg-red-500 hover:bg-red-600 text-white px-8"
+            disabled={isLoading}
+            className="bg-red-500 hover:bg-red-600 text-white px-8 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Holiday
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              "Create"
+            )}
           </Button>
           <Link href="/app">
             <Button
               type="button"
               variant="ghost"
               className="px-6 text-gray-600"
+              disabled={isLoading}
             >
               Discard
             </Button>

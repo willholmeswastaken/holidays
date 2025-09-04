@@ -55,10 +55,8 @@ export const create = mutation({
   args: {
     title: v.string(),
     description: v.optional(v.string()),
-    // Use one date for both start and end for now
     date: v.string(),
     location: v.string(),
-    // Optional lat/lng from client; default to 0 if not provided
     locationLat: v.optional(v.number()),
     locationLng: v.optional(v.number()),
   },
