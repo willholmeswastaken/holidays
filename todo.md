@@ -15,9 +15,10 @@
 
 ## Next Steps
 
-- [ ] Add file upload functionality
-- [ ] Implement holiday sharing features
-- [ ] Add calendar view
-- [ ] Create holiday statistics dashboard
-- [ ] Add email notifications
-- [ ] Implement holiday templates
+- [ ] Edit holiday
+- [ ] Delete Holiday
+- [ ] View holiday
+- [ ] Favourite holiday
+- [ ] Polish up the listing ui
+- [ ] Polish up the map popup
+- [ ] Ensure eslint is working correctly
