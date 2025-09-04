@@ -14,6 +14,8 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as holidays from "../holidays.js";
+import type * as http from "../http.js";
+import type * as util from "../util.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -25,6 +27,8 @@ import type * as holidays from "../holidays.js";
  */
 declare const fullApi: ApiFromModules<{
   holidays: typeof holidays;
+  http: typeof http;
+  util: typeof util;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

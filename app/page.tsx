@@ -44,7 +44,7 @@ export default function LandingPage() {
         </div>
 
         <div className="space-y-4">
-          <SignInButton>
+          <SignInButton forceRedirectUrl="/app">
             <Button size="lg" className="px-8">
               Get Started
             </Button>

@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "api.mapbox.com",
       },
+      {
+        protocol: "https",
+        hostname: "acoustic-lynx-3.convex.cloud",
+      },
     ],
   },
 };

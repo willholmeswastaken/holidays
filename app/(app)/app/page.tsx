@@ -8,7 +8,7 @@ export default async function AppHome() {
   return (
     <div className="flex-1">
       <div className="max-w-7xl mx-auto space-y-6">
-        <HolidayViewToggler preloadedHolidays={preloadedHolidays} />;
+        <HolidayViewToggler preloadedHolidays={preloadedHolidays} />
       </div>
     </div>
   );
