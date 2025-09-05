@@ -1,60 +1,51 @@
-import { Calendar, MapPin, MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Calendar, MapPin } from "lucide-react";
+import Image from "next/image";
 
 interface HolidayCardProps {
-  title: string
-  location: string
-  date: string
-  image: string
-  description?: string
+  title: string;
+  location: string;
+  date: string;
+  image: string;
+  description?: string;
 }
 
-export function HolidayCard({ title, location, date, image, description }: HolidayCardProps) {
+export function HolidayCard({
+  title,
+  location,
+  date,
+  image,
+  description,
+}: HolidayCardProps) {
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-lg hover:shadow-gray-200/50 border-gray-200">
-      <div className="aspect-video overflow-hidden">
-        <img
-          src={image || "/placeholder.svg"}
-          alt={title}
-          className="h-full w-full object-cover transition-transform hover:scale-105"
-        />
-      </div>
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <h3 className="font-semibold leading-none tracking-tight text-gray-900">{title}</h3>
-            <div className="flex items-center gap-4 text-sm text-gray-500">
-              <div className="flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {location}
-              </div>
-              <div className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                {date}
-              </div>
-            </div>
+    <div className="group relative aspect-square overflow-hidden rounded-md">
+      <Image
+        src={image || "/holiday-fallback.svg"}
+        alt={title}
+        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        width={400}
+        height={400}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute inset-0 flex flex-col justify-end p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <h3 className="text-white text-lg font-semibold leading-tight line-clamp-2">
+          {title}
+        </h3>
+        <div className="mt-2 flex items-center gap-4 text-sm text-gray-200">
+          <div className="flex items-center gap-1">
+            <MapPin className="h-3 w-3" />
+            <span className="truncate">{location}</span>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600">
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>Edit Holiday</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">Delete Holiday</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-1">
+            <Calendar className="h-3 w-3" />
+            <span>{date}</span>
+          </div>
         </div>
-      </CardHeader>
-      {description && (
-        <CardContent className="pt-0">
-          <p className="text-sm text-gray-600 line-clamp-2">{description}</p>
-        </CardContent>
-      )}
-    </Card>
-  )
+        {description && (
+          <p className="mt-2 text-xs text-gray-200/90 line-clamp-2">
+            {description}
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
