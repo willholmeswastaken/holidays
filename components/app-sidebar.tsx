@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { Home, Plus, BarChart3, Settings } from "lucide-react";
+import { Home, Plus } from "lucide-react";
 
 import {
   Sidebar,
@@ -25,16 +25,6 @@ const navItems = [
     title: "Home",
     url: "/app",
     icon: Home,
-  },
-  {
-    title: "Statistics",
-    url: "#stats",
-    icon: BarChart3,
-  },
-  {
-    title: "Settings",
-    url: "#settings",
-    icon: Settings,
   },
 ];
 
