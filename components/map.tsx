@@ -11,9 +11,10 @@ type Holiday = FunctionReturnType<typeof api.holidays.get>[0];
 
 type MapboxMapProps = {
   holidays?: Holiday[];
+  onHolidaySelect?: (holiday: Holiday) => void;
 };
 
-const MapboxMap = ({ holidays = [] }: MapboxMapProps) => {
+const MapboxMap = ({ holidays = [], onHolidaySelect }: MapboxMapProps) => {
   const [viewport, setViewport] = useState({
     latitude: 51.5074,
     longitude: -0.1278,
@@ -53,7 +54,7 @@ const MapboxMap = ({ holidays = [] }: MapboxMapProps) => {
           onClose={() => setPopupInfo(null)}
           className="custom-popup"
         >
-          <div className="bg-gray-900 rounded-lg shadow-xl border border-gray-700 overflow-hidden min-w-[320px] max-w-[380px]">
+          <div className="bg-card rounded-lg shadow-xl border border-border overflow-hidden min-w-[320px] max-w-[380px]">
             {/* Header with Image */}
             <div className="relative">
               {popupInfo.coverPhotoId ? (
@@ -76,7 +77,7 @@ const MapboxMap = ({ holidays = [] }: MapboxMapProps) => {
               <div className="absolute top-3 right-3">
                 <button
                   onClick={() => setPopupInfo(null)}
-                  className="bg-gray-900/80 hover:bg-gray-800/80 text-white p-1.5 rounded-full transition-colors backdrop-blur-sm"
+                  className="bg-background/80 hover:bg-muted/80 text-foreground p-1.5 rounded-full transition-colors backdrop-blur-sm"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -93,16 +94,16 @@ const MapboxMap = ({ holidays = [] }: MapboxMapProps) => {
             <div className="p-4">
               {/* Title */}
               <div className="flex items-center gap-2 mb-3">
-                <Plane className="w-5 h-5 text-gray-400" />
-                <h3 className="text-white font-bold text-lg">
+                <Plane className="w-5 h-5 text-muted-foreground" />
+                <h3 className="text-card-foreground font-bold text-lg">
                   {popupInfo.title}
                 </h3>
               </div>
 
               {/* Address */}
               <div className="flex items-start gap-2 mb-4">
-                <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                <p className="text-gray-300 text-sm leading-relaxed">
+                <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                <p className="text-muted-foreground text-sm leading-relaxed">
                   {popupInfo.location}
                 </p>
               </div>
@@ -110,7 +111,7 @@ const MapboxMap = ({ holidays = [] }: MapboxMapProps) => {
               {/* Description */}
               {popupInfo.description && (
                 <div className="mb-4">
-                  <p className="text-gray-300 text-sm leading-relaxed">
+                  <p className="text-muted-foreground text-sm leading-relaxed">
                     {popupInfo.description}
                   </p>
                 </div>
@@ -118,7 +119,13 @@ const MapboxMap = ({ holidays = [] }: MapboxMapProps) => {
 
               {/* Action Buttons */}
               <div className="flex gap-3 mb-3">
-                <button className="flex-1 bg-gray-800 hover:bg-gray-700 text-white text-sm py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-colors border border-gray-700">
+                <button
+                  onClick={() => {
+                    onHolidaySelect?.(popupInfo);
+                    setPopupInfo(null);
+                  }}
+                  className="flex-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground text-sm py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-colors border border-border"
+                >
                   <Send className="w-4 h-4" />
                   View
                 </button>
@@ -129,7 +136,7 @@ const MapboxMap = ({ holidays = [] }: MapboxMapProps) => {
               </div>
 
               {/* Date */}
-              <div className="text-gray-400 text-xs text-center pt-3 border-t border-gray-700">
+              <div className="text-muted-foreground text-xs text-center pt-3 border-t border-border">
                 Visited on {new Date(popupInfo.startDate).toLocaleDateString()}
               </div>
             </div>

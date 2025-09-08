@@ -7,6 +7,7 @@ interface HolidayCardProps {
   date: string;
   image: string;
   description?: string;
+  onClick?: () => void;
 }
 
 export function HolidayCard({
@@ -15,9 +16,13 @@ export function HolidayCard({
   date,
   image,
   description,
+  onClick,
 }: HolidayCardProps) {
   return (
-    <div className="group relative aspect-square overflow-hidden rounded-md">
+    <div
+      className="group relative aspect-square overflow-hidden rounded-md cursor-pointer"
+      onClick={onClick}
+    >
       <Image
         src={image || "/holiday-fallback.svg"}
         alt={title}
@@ -30,7 +35,7 @@ export function HolidayCard({
         <h3 className="text-white text-lg font-semibold leading-tight line-clamp-2">
           {title}
         </h3>
-        <div className="mt-2 flex items-center gap-4 text-sm text-gray-200">
+        <div className="mt-2 flex items-center gap-4 text-sm text-gray-100">
           <div className="flex items-center gap-1">
             <MapPin className="h-3 w-3" />
             <span className="truncate">{location}</span>
@@ -41,7 +46,7 @@ export function HolidayCard({
           </div>
         </div>
         {description && (
-          <p className="mt-2 text-xs text-gray-200/90 line-clamp-2">
+          <p className="mt-2 text-xs text-gray-100/90 line-clamp-2">
             {description}
           </p>
         )}

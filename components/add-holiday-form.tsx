@@ -103,43 +103,45 @@ export function AddHolidayForm() {
     <div className="max-w-4xl mx-auto space-y-8">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {/* Details Section */}
-        <div className="bg-white border border-gray-200 rounded-lg">
-          <div className="border-b border-gray-200 px-6 py-4">
-            <h3 className="text-base font-medium text-gray-900">Details</h3>
+        <div className="border-2 border-border shadow-xl rounded-xl bg-card/80 backdrop-blur-md">
+          <div className="border-b-2 border-border/40 px-6 py-5 bg-muted/50 rounded-t-xl">
+            <h3 className="text-lg font-bold text-foreground">Details</h3>
           </div>
 
           <div className="p-6 space-y-6">
             {/* Title */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label
                 htmlFor="title"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-semibold text-foreground"
               >
                 Title
               </Label>
               <Input
                 id="title"
                 placeholder="Give your holiday a memorable title"
-                className="w-full"
+                className="w-full h-11 border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all duration-200 bg-background/50"
                 {...register("title", { required: "Title is required" })}
               />
               {errors.title && (
-                <p className="text-xs text-red-600">{errors.title.message}</p>
+                <p className="text-xs text-red-600 font-medium">
+                  {errors.title.message}
+                </p>
               )}
             </div>
 
             {/* Description */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Label
                 htmlFor="description"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-semibold text-foreground"
               >
                 Description
               </Label>
               <Textarea
                 id="description"
                 placeholder="Share your holiday story and memorable moments..."
-                className="min-h-[100px] resize-none"
+                className="min-h-[100px] resize-none border-2 border-border focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all duration-200 bg-background/50"
                 {...register("description", {
                   maxLength: {
                     value: 2000,
@@ -148,22 +150,24 @@ export function AddHolidayForm() {
                 })}
               />
               {errors.description && (
-                <p className="text-xs text-red-600">
+                <p className="text-xs text-red-600 font-medium">
                   {errors.description.message}
                 </p>
               )}
-              <div className="text-xs text-gray-500 text-right">
+              <div className="text-xs text-muted-foreground text-right font-medium">
                 {(watch("description") || "").length}/2000
               </div>
             </div>
 
             {/* Cover Photo */}
             <div className="space-y-3">
-              <Label className="text-sm font-medium text-gray-700">
+              <Label className="text-sm font-semibold text-foreground">
                 Cover Photo
               </Label>
-              <div className="flex items-start gap-4">
-                <div className="w-32 h-20 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden">
+
+              {/* Mobile: Stack vertically, Desktop: Side by side */}
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-4">
+                <div className="w-full h-24 md:w-32 md:h-20 bg-muted rounded-lg border-2 border-dashed border-border hover:border-primary hover:bg-muted/80 transition-all duration-200 flex items-center justify-center relative overflow-hidden shadow-sm">
                   {coverImage ? (
                     <Image
                       src={URL.createObjectURL(coverImage)}
@@ -172,10 +176,11 @@ export function AddHolidayForm() {
                       className="object-cover"
                     />
                   ) : (
-                    <ImageIcon className="h-8 w-8 text-gray-400" />
+                    <ImageIcon className="h-8 w-8 text-muted-foreground" />
                   )}
                 </div>
-                <div className="flex-1">
+
+                <div className="flex-1 space-y-2">
                   <input
                     ref={coverInputRef}
                     type="file"
@@ -188,11 +193,11 @@ export function AddHolidayForm() {
                     variant="outline"
                     size="sm"
                     onClick={() => coverInputRef.current?.click()}
-                    className="mb-2"
+                    className="w-full md:w-auto border-2 border-border/60 hover:border-primary hover:bg-primary/5 transition-all duration-200 font-medium"
                   >
                     Upload
                   </Button>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground font-medium leading-relaxed">
                     Select or upload an image that shows your holiday&apos;s
                     best moment. This will be the main image people see.
                   </p>
@@ -201,9 +206,9 @@ export function AddHolidayForm() {
             </div>
 
             {/* Location */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-primary" />
                 Location
               </Label>
               <Controller
@@ -234,7 +239,7 @@ export function AddHolidayForm() {
               )}
               {watch("location") && (
                 <div className="flex flex-wrap gap-2 mt-2">
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-secondary text-secondary-foreground">
                     {watch("location")}
                   </span>
                 </div>
@@ -242,9 +247,9 @@ export function AddHolidayForm() {
             </div>
 
             {/* Date */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-primary" />
                 Date Visited
               </Label>
               <Controller
@@ -267,11 +272,11 @@ export function AddHolidayForm() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3">
+        <div className="flex gap-4 pt-4">
           <Button
             type="submit"
             disabled={isLoading}
-            className="bg-red-500 hover:bg-red-600 text-white px-8 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 h-12 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
           >
             {isLoading ? (
               <>
@@ -279,14 +284,14 @@ export function AddHolidayForm() {
                 Creating...
               </>
             ) : (
-              "Create"
+              "Create Holiday"
             )}
           </Button>
           <Link href="/app">
             <Button
               type="button"
               variant="ghost"
-              className="px-6 text-gray-600"
+              className="px-6 py-3 h-12 font-medium border-2 border-border/60 hover:border-primary hover:bg-primary/5 transition-all duration-200"
               disabled={isLoading}
             >
               Discard

@@ -129,14 +129,14 @@ export function DatePicker({
           placeholder={placeholder}
           value={formatDisplayDate(value)}
           readOnly
-          className="w-full pr-10 cursor-pointer bg-white"
+          className="w-full pr-10 cursor-pointer bg-background"
           onClick={() => setIsOpen(!isOpen)}
         />
-        <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+        <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
       </div>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 w-80">
+        <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-50 p-4 w-80">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <Button
@@ -147,7 +147,7 @@ export function DatePicker({
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <h3 className="font-medium text-gray-900">{monthYear}</h3>
+            <h3 className="font-medium text-card-foreground">{monthYear}</h3>
             <Button
               variant="ghost"
               size="sm"
@@ -163,7 +163,7 @@ export function DatePicker({
             {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
               <div
                 key={index}
-                className="h-8 flex items-center justify-center text-xs font-medium text-gray-500"
+                className="h-8 flex items-center justify-center text-xs font-medium text-muted-foreground"
               >
                 {day}
               </div>
@@ -177,12 +177,12 @@ export function DatePicker({
                 {date && (
                   <button
                     onClick={() => handleDateSelect(date)}
-                    className={`h-8 w-8 rounded-md text-sm font-medium transition-colors hover:bg-gray-100 ${
+                    className={`h-8 w-8 rounded-md text-sm font-medium transition-colors hover:bg-muted ${
                       isSelected(date)
                         ? "bg-red-500 text-white hover:bg-red-600"
                         : isToday(date)
-                          ? "bg-gray-100 text-gray-900"
-                          : "text-gray-700"
+                          ? "bg-muted text-foreground"
+                          : "text-foreground"
                     }`}
                   >
                     {date.getDate()}
@@ -193,12 +193,12 @@ export function DatePicker({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+          <div className="flex items-center justify-between pt-3 border-t border-border">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleClear}
-              className="text-gray-600 hover:text-gray-900"
+              className="text-muted-foreground hover:text-foreground"
             >
               Clear
             </Button>

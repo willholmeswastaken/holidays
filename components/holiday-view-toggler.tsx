@@ -26,19 +26,9 @@ export default function HolidayViewToggler({
           onValueChange={(value) => setScrapbookView(value as ToggleView)}
           className="space-y-6"
         >
-          <TabsList className="bg-white border border-gray-200">
-            <TabsTrigger
-              value="list"
-              className="data-[state=active]:bg-gray-100 text-gray-700"
-            >
-              List View
-            </TabsTrigger>
-            <TabsTrigger
-              value="map"
-              className="data-[state=active]:bg-gray-100 text-gray-700"
-            >
-              Map View
-            </TabsTrigger>
+          <TabsList className="bg-background border-2 border-border shadow-sm p-1 rounded-lg">
+            <TabsTrigger value="list">List View</TabsTrigger>
+            <TabsTrigger value="map">Map View</TabsTrigger>
           </TabsList>
 
           <TabsContent value="list" className="space-y-4">
