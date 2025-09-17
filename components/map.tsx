@@ -54,7 +54,7 @@ const MapboxMap = ({ holidays = [], onHolidaySelect }: MapboxMapProps) => {
           onClose={() => setPopupInfo(null)}
           className="custom-popup"
         >
-          <div className="bg-card rounded-lg shadow-xl border border-border overflow-hidden min-w-[320px] max-w-[380px]">
+          <div className="bg-card rounded-xl shadow-2xl border border-border overflow-hidden min-w-[320px] max-w-[380px] backdrop-blur-sm">
             {/* Header with Image */}
             <div className="relative">
               {popupInfo.coverPhotoId ? (
@@ -83,7 +83,7 @@ const MapboxMap = ({ holidays = [], onHolidaySelect }: MapboxMapProps) => {
                 </button>
               </div>
               <div className="absolute bottom-3 left-3">
-                <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1">
                   <CheckCircle className="w-3 h-3" />
                   Holiday
                 </span>
@@ -129,7 +129,7 @@ const MapboxMap = ({ holidays = [], onHolidaySelect }: MapboxMapProps) => {
                   <Send className="w-4 h-4" />
                   View
                 </button>
-                <button className="flex-1 bg-gray-800 hover:bg-gray-700 text-white text-sm py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-colors border border-gray-700">
+                <button className="flex-1 bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground text-sm py-2.5 px-3 rounded-lg flex items-center justify-center gap-2 transition-colors border border-border">
                   <Star className="w-4 h-4" />
                   Favourite
                 </button>
