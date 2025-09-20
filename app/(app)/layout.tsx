@@ -14,7 +14,7 @@ export default async function AppLayout({
         <AppSidebar />
         <div className="flex flex-col flex-1">
           <AppHeader />
-          <main className="relative flex min-h-svh flex-1 flex-col px-6 pb-6 pt-6">
+          <main className="relative flex flex-1 flex-col px-6 pb-6 pt-6">
             {children}
           </main>
         </div>

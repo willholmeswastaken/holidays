@@ -100,17 +100,17 @@ export function AddHolidayForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Details Section */}
         <div className="border-2 border-border shadow-xl rounded-xl bg-card/80 backdrop-blur-md">
           <div className="border-b-2 border-border/40 px-6 py-5 bg-muted/50 rounded-t-xl">
             <h3 className="text-lg font-bold text-foreground">Details</h3>
           </div>
 
-          <div className="p-6 space-y-6">
+          <div className="p-4 space-y-4">
             {/* Title */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <Label
                 htmlFor="title"
                 className="text-sm font-semibold text-foreground"
@@ -131,7 +131,7 @@ export function AddHolidayForm() {
             </div>
 
             {/* Description */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <Label
                 htmlFor="description"
                 className="text-sm font-semibold text-foreground"
@@ -160,7 +160,7 @@ export function AddHolidayForm() {
             </div>
 
             {/* Cover Photo */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <Label className="text-sm font-semibold text-foreground">
                 Cover Photo
               </Label>
@@ -206,7 +206,7 @@ export function AddHolidayForm() {
             </div>
 
             {/* Location */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <Label className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
                 Location
@@ -247,7 +247,7 @@ export function AddHolidayForm() {
             </div>
 
             {/* Date */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               <Label className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-primary" />
                 Date Visited
@@ -272,11 +272,11 @@ export function AddHolidayForm() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-4 pt-4">
+        <div className="flex gap-3 pt-2">
           <Button
             type="submit"
             disabled={isLoading}
-            className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 h-12 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 h-12 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
           >
             {isLoading ? (
               <>

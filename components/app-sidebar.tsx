@@ -1,7 +1,8 @@
 "use client";
 
 import type * as React from "react";
-import { Home, Plus } from "lucide-react";
+import { Home, Plus, LogOut } from "lucide-react";
+import { SignOutButton } from "@clerk/nextjs";
 
 import {
   Sidebar,
@@ -19,12 +20,18 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// Minimal navigation items
+// Navigation items including sign out
 const navItems = [
   {
     title: "Home",
     url: "/app",
     icon: Home,
+  },
+  {
+    title: "Sign Out",
+    url: "#",
+    icon: LogOut,
+    isSignOut: true,
   },
 ];
 
@@ -98,7 +105,7 @@ export function AppSidebar() {
         {/* Add Holiday Button - Clean and prominent */}
         <div className="py-3 mb-4">
           <Link href="/app/holidays/add" onClick={handleLinkClick}>
-            <Button className="w-full bg-red-500 hover:bg-red-600 text-white font-medium h-10 rounded-lg transition-all group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:rounded-lg">
+            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium h-10 rounded-lg transition-all group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:rounded-lg">
               <Plus className="h-5 w-5" />
               <span className="group-data-[collapsible=icon]:hidden ml-2">
                 Add Holiday
@@ -113,15 +120,35 @@ export function AppSidebar() {
             <SidebarMenu className="space-y-1">
               {navItems.map((item) => {
                 const isActive = currentPath === item.url;
+                const isSignOut = item.isSignOut;
+
+                if (isSignOut) {
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SignOutButton>
+                        <SidebarMenuButton
+                          tooltip={item.title}
+                          className="text-red-500 hover:text-red-600 rounded-lg h-10 font-medium transition-all group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center"
+                        >
+                          <item.icon className="h-5 w-5" />
+                          <span className="group-data-[collapsible=icon]:hidden ml-3">
+                            {item.title}
+                          </span>
+                        </SidebarMenuButton>
+                      </SignOutButton>
+                    </SidebarMenuItem>
+                  );
+                }
+
                 return (
                   <SidebarMenuItem key={item.title}>
                     <Link href={item.url} onClick={handleLinkClick}>
                       <SidebarMenuButton
                         tooltip={item.title}
                         isActive={isActive}
-                        className={`text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-lg h-10 font-medium transition-all group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center ${
+                        className={`text-sidebar-foreground/80 hover:text-sidebar-accent-foreground rounded-lg h-10 font-medium transition-all group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center ${
                           isActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
+                            ? "text-sidebar-accent-foreground font-semibold"
                             : ""
                         }`}
                       >
